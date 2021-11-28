@@ -45,13 +45,14 @@ echo ""
 PID=$$
 SCRIPT="$0"
 # TAGTIME=$(date +"%Y%m%d%H%M%S")
-PROJECTDIR=$(cd ${0%/*}/.. ; pwd)
+PROJECTDIR=$(cd "${0%/*}" ; pwd)
 # PROJECTDIR_ABS=$(cd ${0%/*}/.. ; pwd -P)
-BASETMPDIR="/tmp"
-TMPDIR="$BASETMPDIR/$PID"
+BASETMPDIR="${BASETMPDIR:-"/tmp"}"
+TMPDIR="${TMPDIR:-"$BASETMPDIR/$PID"}"
 export SCRIPT PROJECTDIR TMPDIR
+echo "$SCRIPT -- $PROJECTDIR -- $TMPDIR"
 
-echo "Debug-Exit"; exit 1
+
 
 # ################
 # INITIALIZATION #
@@ -64,14 +65,20 @@ echo "Debug-Exit"; exit 1
 printf "Initializing script environment..."
 sleep 0.5s
 
-mkdir xml 2> /dev/null && chmod 0777 xml 2> /dev/null
-mkdir combine 2> /dev/null && chmod 0777 combine 2> /dev/null
+mkdir "$PROJECTDIR/xml"     2> /dev/null && chmod 0777 "$PROJECTDIR/xml"     2> /dev/null
+mkdir "$PROJECTDIR/combine" 2> /dev/null && chmod 0777 "$PROJECTDIR/combine" 2> /dev/null
+echo "Debug-Exit"; exit 1
 
-if ! chmod -R 0777 . 2> /dev/null
+# find "$PROJECTDIR/" ! -iname "*.sh" ! -iname "*.pl" -type f -exec chmod -v 644  {} \;
+# find "$PROJECTDIR/" -iname "*.sh"   -type f -exec chmod -v 755  {} \;
+# find "$PROJECTDIR/" -iname "*.pl"   -type f -exec chmod -v 755  {} \;
+
+if ! find "$PROJECTDIR/" ! -iname "*.sh" ! -iname "*.pl" -type f -exec chmod -v 644  {} \;  # 2> /dev/null
 then
 	printf "\nPermissions of script folder could not be set "
 	ERROR="true"
 fi
+echo "Debug-Exit"; exit 1
 
 if ! ls -ld /tmp | grep -q "drwxrwxrw[tx]" 2> /dev/null
 then
